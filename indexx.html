@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Together - App di Coppia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logout-btn {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .login-container {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #f0f0f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .category-card.restaurants { border-color: #ff6b6b; }
+        .category-card.people { border-color: #4ecdc4; }
+        .category-card.places { border-color: #45b7d1; }
+        .category-card.activities { border-color: #f9ca24; }
+
+        .category-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .category-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .items-container {
+            padding: 20px;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .item-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .rating-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .user-rating {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .stars {
+            display: flex;
+            gap: 5px;
+        }
+
+        .star {
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.2s;
+            color: #ddd;
+        }
+
+        .star.active {
+            color: #ffd700;
+        }
+
+        .average-rating {
+            text-align: center;
+            padding-top: 10px;
+            border-top: 1px solid #e1e1e1;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .notes-section {
+            margin-top: 15px;
+        }
+
+        .notes-section textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e1e1e1;
+            border-radius: 6px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        .item-actions {
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .delete-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #ee5a52;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: calc(100% - 40px);
+            max-width: 400px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e1e1e1;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .image-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 6px;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="login-container">
+            <h1>💕 Rate Together</h1>
+            <div class="login-form">
+                <div class="input-group">
+                    <label for="username">Nome Utente</label>
+                    <input type="text" id="username" placeholder="Inserisci il tuo nome">
+                    <small id="usernameReminder" style="color: #ff6b6b; display: block; margin-top: 8px;">
+                        Ricorda il tuo nome utente esatto per accedere nuovamente!
+                    </small>
+                </div>
+                <button class="login-btn" onclick="login()">Accedi</button>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" class="hidden">
+            <!-- Header -->
+            <div class="header">
+                <h1>Rate Together</h1>
+                <span id="currentUser"></span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+
+            <!-- Home Screen -->
+            <div id="homeScreen">
+                <div class="category-grid">
+                    <div class="category-card restaurants" onclick="showCategory('restaurants')">
+                        <div class="category-icon">🍽️</div>
+                        <div class="category-title">Ristoranti</div>
+                    </div>
+                    <div class="category-card people" onclick="showCategory('people')">
+                        <div class="category-icon">👥</div>
+                        <div class="category-title">Persone</div>
+                    </div>
+                    <div class="category-card places" onclick="showCategory('places')">
+                        <div class="category-icon">🏖️</div>
+                        <div class="category-title">Luoghi</div>
+                    </div>
+                    <div class="category-card activities" onclick="showCategory('activities')">
+                        <div class="category-icon">🎯</div>
+                        <div class="category-title">Attività</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Screen -->
+            <div id="categoryScreen" class="hidden">
+                <div class="items-container">
+                    <button class="back-btn" onclick="showHome()">← Indietro</button>
+                    <button class="add-btn" onclick="showAddModal()">Aggiungi Nuovo</button>
+                    <div id="itemsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Item Modal -->
+        <div id="addModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Aggiungi Nuovo</h2>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label for="itemName">Nome</label>
+                    <input type="text" id="itemName" placeholder="Nome dell'elemento">
+                </div>
+                <div class="form-group">
+                    <label for="itemDescription">Descrizione</label>
+                    <textarea id="itemDescription" placeholder="Breve descrizione"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="itemNotes">Note</label>
+                    <textarea id="itemNotes" placeholder="Note aggiuntive (opzionale)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Immagine</label>
+                    <div class="image-upload">
+                        <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="previewImage()">
+                        <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
+                            Carica dalla Galleria
+                        </button>
+                        <img id="imagePreview" class="preview-image" style="display:none">
+                    </div>
+                </div>
+                <button class="save-btn" onclick="saveItem()">Salva</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase App (compat) SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+    <script>
+        // Configurazione Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSEWF3ONnAXx5bmIHQQU9RCpxxFDRBeCY",
+            authDomain: "ratetogether.firebaseapp.com",
+            databaseURL: "https://ratetogether-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "ratetogether",
+            storageBucket: "ratetogether.appspot.com",
+            messagingSenderId: "182887332280",
+            appId: "1:182887332280:web:c47858595ce6e58b25774d",
+            measurementId: "G-PTSYR252T6"
+        };
+
+        // Inizializza Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // In-memory storage
+        let appData = {
+            users: [],
+            currentUser: null,
+            items: {
+                restaurants: [],
+                people: [],
+                places: [],
+                activities: []
+            }
+        };
+
+        let currentCategory = '';
+        let currentImageData = '';
+
+        // Salva i dati su Firebase
+        function saveData() {
+            if (!appData.currentUser) return;
+            firebase.database().ref('users/' + appData.currentUser).set(appData)
+                .then(() => console.log("Dati salvati"))
+                .catch(err => console.error("Errore salvataggio:", err));
+        }
+
+        // Carica i dati da Firebase
+        function loadData(callback) {
+            const username = document.getElementById('username').value.trim();
+            if (!username) {
+                alert("Inserisci un nome utente");
+                return;
+            }
+
+            firebase.database().ref('users/' + username).once('value')
+                .then(snapshot => {
+                    const data = snapshot.val();
+                    if (data) {
+                        appData = data;
+                    } else {
+                        appData = {
+                            users: [username],
+                            currentUser: username,
+                            items: {
+                                restaurants: [],
+                                people: [],
+                                places: [],
+                                activities: []
+                            }
+                        };
+                    }
+
+                    appData.currentUser = username;
+
+                    if (!appData.users.includes(username)) {
+                        appData.users.push(username);
+                    }
+
+                    document.getElementById('currentUser').textContent = `Ciao, ${username}!`;
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('mainApp').classList.remove('hidden');
+
+                    if (typeof callback === 'function') callback();
+                })
+                .catch(err => console.error("Errore caricamento:", err));
+        }
+
+        // Login functionality
+        function login() {
+            loadData();
+
+            const username = document.getElementById('username').value.trim();
+            if (!username) {
+                alert('Inserisci un nome utente');
+                return;
+            }
+
+            // Add user if not exists
+            if (!appData.users.includes(username)) {
+                appData.users.push(username);
+                saveData(); // Salva quando aggiungi un nuovo utente
+            }
+
+            appData.currentUser = username;
+            document.getElementById('currentUser').textContent = `Ciao, ${username}!`;
+
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+        }
+
+        function logout() {
+            appData.currentUser = null;
+            document.getElementById('username').value = '';
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            showHome();
+        }
+
+        // Navigation
+        function showHome() {
+            document.getElementById('homeScreen').classList.remove('hidden');
+            document.getElementById('categoryScreen').classList.add('hidden');
+        }
+
+        function showCategory(category) {
+            currentCategory = category;
+            document.getElementById('homeScreen').classList.add('hidden');
+            document.getElementById('categoryScreen').classList.remove('hidden');
+            displayItems();
+        }
+
+        // Display items
+        function displayItems() {
+            const itemsList = document.getElementById('itemsList');
+            const items = appData.items[currentCategory] || [];
+
+            itemsList.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'item-card';
+
+                const averageRating = calculateAverage(item.ratings);
+
+                itemCard.innerHTML = `
+                    ${item.image ? `<img src="${item.image}" alt="${item.name}" class="item-image">` : ''}
+                    <div class="item-title">${item.name}</div>
+                    <div style="font-size: 12px; color: #888; margin-bottom: 8px;">
+                        Creato il: ${item.createdAt || 'Data non disponibile'}
+                    </div>
+                    <div class="item-description">${item.description}</div>
+
+                    <div class="rating-section">
+                        ${appData.users.map(user => `
+                            <div class="user-rating">
+                                <span class="user-name">${user}</span>
+                                <div class="stars">
+                                    ${[1,2,3,4,5].map(star => `
+                                        <span class="star ${(item.ratings[user] || 0) >= star ? 'active' : ''}"
+                                              onclick="setRating(${index}, '${user}', ${star})"
+                                              style="cursor: ${user === appData.currentUser ? 'pointer' : 'default'}; opacity: ${user === appData.currentUser ? '1' : '0.7'}">★</span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+
+                        <div class="average-rating">
+                            Media: ${averageRating.toFixed(1)} ★
+                        </div>
+                    </div>
+
+                    <div class="notes-section">
+                        <textarea placeholder="Note aggiuntive..."
+                                  onchange="updateNotes(${index}, this.value)">${item.notes || ''}</textarea>
+                    </div>
+
+                    <div class="item-actions">
+                        ${item.createdBy === appData.currentUser ?
+                            `<button class="delete-btn" onclick="deleteItem(${index})">Elimina</button>` :
+                            ''}
+                    </div>
+                `;
+
+                itemsList.appendChild(itemCard);
+            });
+        }
+
+        // Elimina item
+        function deleteItem(itemIndex) {
+            if (confirm('Sei sicuro di voler eliminare questo elemento?')) {
+                const item = appData.items[currentCategory][itemIndex];
+
+                // Verifica che l'utente corrente sia il creatore
+                if (item.createdBy === appData.currentUser) {
+                    appData.items[currentCategory].splice(itemIndex, 1);
+                    saveData();
+                    displayItems();
+                } else {
+                    alert('Non hai i permessi per eliminare questo elemento');
+                }
+            }
+        }
+
+        // Rating functionality
+        function setRating(itemIndex, user, rating) {
+            // Only allow current user to rate
+            if (user !== appData.currentUser) {
+                return;
+            }
+
+            if (!appData.items[currentCategory][itemIndex].ratings) {
+                appData.items[currentCategory][itemIndex].ratings = {};
+            }
+            appData.items[currentCategory][itemIndex].ratings[user] = rating;
+            saveData();
+            displayItems();
+        }
+
+        function calculateAverage(ratings) {
+            if (!ratings || Object.keys(ratings).length === 0) return 0;
+            const values = Object.values(ratings);
+            return values.reduce((a, b) => a + b, 0) / values.length;
+        }
+
+        function updateNotes(itemIndex, notes) {
+            appData.items[currentCategory][itemIndex].notes = notes;
+            saveData();
+        }
+
+        // Modal functionality
+        function showAddModal() {
+            document.getElementById('addModal').style.display = 'flex';
+            clearForm();
+        }
+
+        function closeModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+
+        function clearForm() {
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemDescription').value = '';
+            document.getElementById('itemNotes').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            currentImageData = '';
+        }
+
+        // Image handling
+        function previewImage() {
+            const file = document.getElementById('imageInput').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageData = e.target.result;
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = currentImageData;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Save item
+        function saveItem() {
+            const name = document.getElementById('itemName').value.trim();
+            const description = document.getElementById('itemDescription').value.trim();
+            const notes = document.getElementById('itemNotes').value.trim();
+
+            if (!name || !description) {
+                alert('Nome e descrizione sono obbligatori');
+                return;
+            }
+
+            const newItem = {
+                name: name,
+                description: description,
+                notes: notes,
+                image: currentImageData,
+                ratings: {},
+                createdBy: appData.currentUser,
+                createdAt: new Date().toLocaleDateString('it-IT')
+            };
+
+            if (!appData.items[currentCategory]) {
+                appData.items[currentCategory] = [];
+            }
+
+            appData.items[currentCategory].push(newItem);
+            saveData();
+            closeModal();
+            displayItems();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('addModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        function resetApp() {
+            localStorage.removeItem('rateTogetherData');
+            location.reload();
+        }
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker registrato!'))
+                .catch(err => console.error('Errore nella registrazione del SW', err));
+        }
+    </script>
+</body>
+</html>
